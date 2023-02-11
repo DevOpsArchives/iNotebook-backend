@@ -1,6 +1,7 @@
 const mongo = require("mongoose");
+const { Schema } = mongo;
 
-const NotesSchema = new mongo.Schema({
+const NotesSchema = new Schema({
   title: {
     type: String,
     required: true,
@@ -8,7 +9,6 @@ const NotesSchema = new mongo.Schema({
   description: {
     type: String,
     required: true,
-    unique: true,
   },
   tag: {
     type: String,

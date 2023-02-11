@@ -1,6 +1,7 @@
 const mongo = require("mongoose");
+const { Schema } = mongo;
 
-const UserSchema = new mongo.Schema({
+const UserSchema = new Schema({
   name: {
     type: String,
     required: true,
@@ -20,4 +21,6 @@ const UserSchema = new mongo.Schema({
   },
 });
 
-module.exports = mongo.model("user", UserSchema);
+const User = mongo.model("user", UserSchema);
+User.createIndexes();
+module.exports = User;
