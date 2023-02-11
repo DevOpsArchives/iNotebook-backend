@@ -1,6 +1,6 @@
 const mongo = require("mongoose");
 
-const NotesSchema = new Schema({
+const NotesSchema = new mongo.Schema({
   title: {
     type: String,
     required: true,
