@@ -1,5 +1,6 @@
 const express = require("express");
 const { body, validationResult } = require("express-validator");
+const bcrypt = require("bcryptjs");
 
 const User = require("../models/Users");
 
@@ -31,11 +32,15 @@ router.post(
           .json({ status: false, msg: "User with this email already exists" });
       }
 
+      let salt = await bcrypt.genSalt(10);
+      let securePassword = await bcrypt.hash(req.body.password, salt);
+
       user = await User.create({
         name: req.body.name,
         email: req.body.email,
-        password: req.body.password,
+        password: securePassword,
       });
+
       return res.json({ status: true, user });
     } catch (error) {
       console.log(error.message);
