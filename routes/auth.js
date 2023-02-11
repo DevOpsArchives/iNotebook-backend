@@ -1,10 +1,11 @@
 const express = require("express");
-const { body, validationResult } = require("express-validator");
+const { body, header, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 // Local Modules
 const User = require("../models/Users");
+const validateUserJWTToken = require("../middleware/validate");
 
 // Instances
 const router = express.Router();
@@ -12,6 +13,7 @@ const router = express.Router();
 // Environment variables
 const JWT_SECRET = process.env.JWT_SECRET;
 
+// ROUTE 1: Create User in the database using: POST "/api/auth/createUser". No Login Required
 router.post(
   "/createUser",
   [
@@ -57,6 +59,7 @@ router.post(
   }
 );
 
+// ROUTE 2: Authenticate used and create JWT Token: POST "/api/auth/login". No Login Required
 router.post(
   "/login",
   [
@@ -97,4 +100,21 @@ router.post(
   }
 );
 
+// ROUTE 2: Get Logged in user details: POST "/api/auth/getUserDetails". Login Required
+router.get(
+  "/getUserDetails",
+  validateUserJWTToken,
+  [header("Authorization", "Enter the JWT Token").exists()],
+  async (req, res) => {
+    // If there is validation error then return error message with 400 statusCode
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ status: false, errors: errors.array() });
+    }
+
+    let userId = req.user.id;
+    const user = await User.findById(userId).select("-password");
+    return res.send(user);
+  }
+);
 module.exports = router;
