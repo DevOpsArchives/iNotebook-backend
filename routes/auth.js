@@ -1,10 +1,16 @@
 const express = require("express");
 const { body, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
+// Local Modules
 const User = require("../models/Users");
 
+// Instances
 const router = express.Router();
+
+// Environment variables
+const JWT_SECRET = process.env.JWT_SECRET;
 
 router.post(
   "/createUser",
@@ -41,7 +47,9 @@ router.post(
         password: securePassword,
       });
 
-      return res.json({ status: true, user });
+      const authToken = jwt.sign({ user: { id: user.id } }, JWT_SECRET);
+
+      return res.json({ status: true, token: authToken });
     } catch (error) {
       console.log(error.message);
       res.status(500).json({ status: false, msg: "Something went wrong" });
