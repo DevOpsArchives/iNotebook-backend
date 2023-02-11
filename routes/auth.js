@@ -57,4 +57,44 @@ router.post(
   }
 );
 
+router.post(
+  "/login",
+  [
+    body("email", "Enter a valid email").isEmail(),
+    body("password", "Password must be at least 5 characters").exists(),
+  ],
+  async (req, res) => {
+    // If there is validation error then return error message with 400 statusCode
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ status: false, errors: errors.array() });
+    }
+
+    const { email, password } = req.body;
+
+    try {
+      let user = await User.findOne({ email: email });
+      if (!user) {
+        return res
+          .status(400)
+          .json({ error: "Try to login with correct credentials" });
+      }
+
+      const passwordCompare = await bcrypt.compare(password, user.password);
+
+      if (!passwordCompare) {
+        return res
+          .status(400)
+          .json({ error: "Try to login with correct credentials" });
+      }
+
+      const authToken = jwt.sign({ user: { id: user.id } }, JWT_SECRET);
+      return res.json({ status: true, token: authToken });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ status: false, msg: "Something went wrong" });
+    }
+  }
+);
+
 module.exports = router;
