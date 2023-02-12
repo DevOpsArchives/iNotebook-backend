@@ -72,4 +72,51 @@ router.post(
     }
   }
 );
+
+router.put("/updateNote/:id", validateUserJWTToken, [
+  header("Authorization", "Enter the JWT Token").exists(),
+  body("title", "Enter a valid Title").isLength({ min: 3 }),
+  body("description", "Description must be at least 20 characters").isLength({
+    min: 20,
+  }),
+  async (req, res) => {
+    // If there is validation error then return error message with 400 statusCode
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ status: false, errors: errors.array() });
+    }
+
+    try {
+      const { title, description, tag } = req.body;
+
+      const newNote = {};
+      if (title) newNote.title = title;
+      if (description) newNote.description = description;
+      if (tag) newNote.tag = tag;
+
+      // Find the note to be updated and update it
+      let note = await Notes.findById(req.params.id);
+      if (!note) {
+        return res.status(404).json({ status: false, msg: "Not found" });
+      }
+
+      if (note.user.toString() !== req.user.id) {
+        return res.status(401).json({ msg: "Not allowed" });
+      }
+
+      note = await Notes.findByIdAndUpdate(
+        req.params.id,
+        { $set: newNote },
+        { new: true }
+      );
+      return res.status(200).json({ status: true, note });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(500)
+        .json({ status: false, msg: "Something went wrong", error });
+    }
+  },
+]);
+
 module.exports = router;
