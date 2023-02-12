@@ -73,6 +73,7 @@ router.post(
   }
 );
 
+// ROUTE 3: Update an existing Note using: PUT "/api/notes/updateNote". Login Required
 router.put("/updateNote/:id", validateUserJWTToken, [
   header("Authorization", "Enter the JWT Token").exists(),
   body("title", "Enter a valid Title").isLength({ min: 3 }),
@@ -100,6 +101,7 @@ router.put("/updateNote/:id", validateUserJWTToken, [
         return res.status(404).json({ status: false, msg: "Not found" });
       }
 
+      // Check if the user has permission to access this note
       if (note.user.toString() !== req.user.id) {
         return res.status(401).json({ msg: "Not allowed" });
       }
@@ -118,5 +120,27 @@ router.put("/updateNote/:id", validateUserJWTToken, [
     }
   },
 ]);
+
+// ROUTE 4: delete an existing Note using: DELETE "/api/notes/deleteNote". Login Required
+router.delete("/deleteNote/:id", validateUserJWTToken, async (req, res) => {
+  try {
+    // Find the note to be updated and update it
+    let note = await Notes.findById(req.params.id);
+    if (!note) {
+      return res.status(404).json({ status: false, msg: "Not found" });
+    }
+
+    // Check if the user has permission to delete this note
+    if (note.user.toString() !== req.user.id) {
+      return res.status(401).json({ msg: "Not allowed" });
+    }
+
+    note = await Notes.findByIdAndDelete(req.params.id);
+    return res.status(200).json({ status: true, note });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ status: false, msg: "Something went wrong", error });
+  }
+});
 
 module.exports = router;
