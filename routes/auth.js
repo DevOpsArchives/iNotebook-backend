@@ -100,7 +100,7 @@ router.post(
   }
 );
 
-// ROUTE 2: Get Logged in user details: POST "/api/auth/getUserDetails". Login Required
+// ROUTE 3: Get Logged in user details: GET "/api/auth/getUserDetails". Login Required
 router.get(
   "/getUserDetails",
   validateUserJWTToken,
@@ -114,7 +114,7 @@ router.get(
 
     let userId = req.user.id;
     const user = await User.findById(userId).select("-password");
-    return res.send(user);
+    return res.json(user);
   }
 );
 module.exports = router;
