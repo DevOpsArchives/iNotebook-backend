@@ -4,12 +4,8 @@ const jwt = require("jsonwebtoken");
 const JWT_SECRET = process.env.JWT_SECRET;
 
 const validateUserJWTToken = (req, res, next) => {
-  const bearerHeader = req.headers["authorization"];
-  if (typeof bearerHeader !== "undefined") {
-    const bearer = bearerHeader.split(" ");
-
-    const token = bearer[1];
-
+  const token = req.headers["authorization"];
+  if (typeof token !== "undefined") {
     try {
       const data = jwt.verify(token, JWT_SECRET);
       req.user = data.user;
