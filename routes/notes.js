@@ -55,13 +55,13 @@ router.post(
         });
       }
 
-      const { title, description, tags } = req.body;
+      const { title, description, tag } = req.body;
 
       note = await Notes.create({
         user: req.user.id,
         title,
         description,
-        tags,
+        tag,
       });
       return res.status(201).json({ status: true, note });
     } catch (error) {
