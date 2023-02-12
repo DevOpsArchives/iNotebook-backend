@@ -1,5 +1,6 @@
 const dotenv = require("dotenv");
 const express = require("express");
+const cors = require("cors");
 
 // Local Imports
 const connectToMongo = require("./db");
@@ -12,8 +13,9 @@ connectToMongo();
 const app = express();
 const port = process.env.PORT;
 
-// To use req.body
+// Using
 app.use(express.json());
+app.use(cors());
 
 // Available Routes
 app.use("/api/auth", require("./routes/auth"));
