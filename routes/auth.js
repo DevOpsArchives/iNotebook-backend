@@ -78,17 +78,19 @@ router.post(
     try {
       let user = await User.findOne({ email: email });
       if (!user) {
-        return res
-          .status(400)
-          .json({ error: "Try to login with correct credentials" });
+        return res.status(400).json({
+          status: false,
+          error: "Try to login with correct credentials",
+        });
       }
 
       const passwordCompare = await bcrypt.compare(password, user.password);
 
       if (!passwordCompare) {
-        return res
-          .status(400)
-          .json({ error: "Try to login with correct credentials" });
+        return res.status(400).json({
+          status: false,
+          error: "Try to login with correct credentials",
+        });
       }
 
       const authToken = jwt.sign({ user: { id: user.id } }, JWT_SECRET);
@@ -114,7 +116,7 @@ router.get(
 
     let userId = req.user.id;
     const user = await User.findById(userId).select("-password");
-    return res.json(user);
+    return res.json({ status: true, user });
   }
 );
 module.exports = router;

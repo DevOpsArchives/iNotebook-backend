@@ -103,7 +103,7 @@ router.put("/updateNote/:id", validateUserJWTToken, [
 
       // Check if the user has permission to access this note
       if (note.user.toString() !== req.user.id) {
-        return res.status(401).json({ msg: "Not allowed" });
+        return res.status(401).json({ status: false, msg: "Not allowed" });
       }
 
       note = await Notes.findByIdAndUpdate(
@@ -132,7 +132,7 @@ router.delete("/deleteNote/:id", validateUserJWTToken, async (req, res) => {
 
     // Check if the user has permission to delete this note
     if (note.user.toString() !== req.user.id) {
-      return res.status(401).json({ msg: "Not allowed" });
+      return res.status(401).json({ status: false, msg: "Not allowed" });
     }
 
     note = await Notes.findByIdAndDelete(req.params.id);
